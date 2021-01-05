@@ -38,16 +38,6 @@ class Goods:
     def waybill(self):
         return self.__waybill
 
-    # def read(self, prompt=None):
-    #     line = input() if prompt is None else input(prompt)
-    #     parts = list(map(str, line.split(',', maxsplit=5)))
-    #
-    #     self.__name = parts[0]
-    #     self.__date = parts[1]
-    #     self.__price = abs(int(parts[2]))
-    #     self.__num = abs(int(parts[3]))
-    #     self.__waybill = parts[4]
-
     def __str__(self):
         return f"Наименование товара: {self.__name}\n" \
             f"Дата оформления: {self.__date}\n" \
