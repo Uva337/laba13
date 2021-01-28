@@ -1,205 +1,204 @@
 #!/usr/bin/env python3
 # -*- config: utf-8 -*-
 
-# Использовать словарь, содержащий следующие ключи: фамилия, имя; номер телефона;
-# дата рождения. Написать программу, выполняющую следующие
-# действия: ввод с клавиатуры данных в список, состоящий из словарей заданной структуры;
-# записи должны быть упорядочены по трем первым цифрам номера телефона; вывод на
-# экран информации о человеке, чья фамилия введена с клавиатуры; если такого нет, выдать
-# на дисплей соответствующее сообщение.
+# Использовать словарь, содержащий следующие ключи: название пункта назначения; номер
+# поезда; время отправления. Написать программу, выполняющую следующие действия:
+# ввод с клавиатуры данных в список, состоящий из словарей заданной структуры; записи должны
+# быть упорядочены по номерам поездов;
+# вывод на экран информации о поезде, номер которого введен с клавиатуры; если таких поездов нет,
+# выдать на дисплей соответствующее сообщение.
 # Выполнить индивидуальное задание 2 лабораторной работы 9, использовав классы данных, а
 # также загрузку и сохранение данных в формат XML.
 
-import sys
-import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
-from typing import List
 
+from dataclasses import dataclass, field
+import sys
+from typing import List
+import xml.etree.ElementTree as ET
 
 @dataclass(frozen=True)
-class peop:
-    surname: str
+class poez:
     name: str
-    number: int
-    year: int
+    num: str
+    time: str
 
 
 @dataclass
 class Staff:
-    people: List[peop] = field(default_factory=lambda: [])
+    poezd: List[poez] = field(default_factory=lambda: [])
 
-    def add(self, surname, name, number, year):
-        self.people.append(
-            peop(
-                surname=surname,
+    def add(self, name, num, time):
+        self.poezd.append(
+            poez(
                 name=name,
-                number=number,
-                year=year
+                num=num,
+                time=time
             )
         )
 
-        self.people.sort(key=lambda peop: peop.number)
+        self.poezd.sort(key=lambda poez: poez.num)
 
     def __str__(self):
+        # Заголовок таблицы.
         table = []
-        line = '+-{}-+-{}-+-{}-+-{}-+-{}-+'.format(
+        line = '+-{}-+-{}-+-{}-+-{}-+'.format(
             '-' * 4,
+            '-' * 30,
             '-' * 20,
-            '-' * 20,
-            '-' * 20,
-            '-' * 15
+            '-' * 17
         )
         table.append(line)
         table.append(
-            '| {:^4} | {:^20} | {:^20} | {:^20} | {:^15} |'.format(
+            '| {:^4} | {:^30} | {:^20} | {:^17} |'.format(
                 "№",
-                "Фамилия ",
-                "Имя",
-                "Номер телефона",
-                "Дата рождения"
+                "Пункт назначения",
+                "Номер поезда",
+                "Время отправления"
             )
         )
         table.append(line)
 
-        for idx, peop in enumerate(self.people, 1):
+
+        for idx, poez in enumerate(self.poezd, 1):
             table.append(
-                '| {:>4} | {:<20} | {:<20} | {:<20} | {:>15} |'.format(
+                '| {:>4} | {:<30} | {:<20} | {:>17} |'.format(
                     idx,
-                    peop.surname,
-                    peop.name,
-                    peop.number,
-                    peop.year
+                    poez.name,
+                    poez.num,
+                    poez.time
                 )
             )
+
         table.append(line)
 
         return '\n'.join(table)
 
     def select(self):
+
         parts = command.split(' ', maxsplit=2)
-        sur = (parts[1])
 
-        count = 0
+        times = int(parts[1])
 
-        for peop in self.people:
-            if peop.get('surname') == sur:
-                count += 1
-                print('Фамилия:', peop.surname)
-                print('Имя:', peop.name)
-                print('Номер телефона:', sorted(key=lambda x: int(str(x)[:3])), peop.number)
-                print('Дата рождения:', peop.year)
+        c = 0
 
-        if count == 0:
-            print("Таких фамилий нет !")
+        for poez1 in self.trains:
+            if poez1.time == times:
+                c += 1
+                print('Номер поезда:', poez1.num)
+                print('Пункт назначения:', poez1.name)
+                print('Время отправления:', poez1.time)
 
-        def load(self, filename):
-            with open(filename, 'r', encoding='utf8') as fin:
-                xml = fin.read()
-            parser = ET.XMLParser(encoding="utf8")
-            tree = ET.fromstring(xml, parser=parser)
-            self.people = []
+        if c == 0:
+            print("Таких поездов нет!")
 
-            for peop_element in tree:
-                surname, name, number, year = None, None, None, None
+    def load(self, filename):
+        with open(filename, 'r', encoding='utf8') as fin:
+            xml = fin.read()
+        parser = ET.XMLParser(encoding="utf8")
+        tree = ET.fromstring(xml, parser=parser)
+        self.poezd = []
 
-                for element in peop_element:
-                    if element.tag == 'surname':
-                        surname = element.text
-                    elif element.tag == 'name':
-                        name = element.text
-                    elif element.tag == 'number':
-                        number = element.text
-                    elif element.tag == 'year':
-                        year = element.text
+        for poez_element in tree:
+            name, num, time = None, None, None
 
-                    if surname is not None and name is not None \
-                            and number is not None and year is not None:
-                        self.people.append(
-                            peop(
-                                suname=surname,
-                                name=name,
-                                number=number,
-                                year=year
-                            )
+            for element in poez_element:
+                if element.tag == 'name':
+                    name = element.text
+                elif element.tag == 'num':
+                    num = element.text
+                elif element.tag == 'time':
+                    time = element.text
+
+                if name is not None and num is not None \
+                        and time is not None:
+                    self.poezd.append(
+                        poez(
+                            name=name,
+                            num=time,
+                            time=time
                         )
+                    )
 
-        def save(self, filename):
-            root = ET.Element('people')
-            for peop in self.people:
-                peop_element = ET.Element('peop')
+    def save(self, filename):
+        root = ET.Element('poezd')
+        for poez in self.poezd:
+            poez_element = ET.Element('poez')
 
-                surname_element = ET.SubElement(peop_element, 'surname')
-                surname_element.text = peop.surname
+            name_element = ET.SubElement(poez_element, 'name')
+            name_element.text = poez.name
 
-                name_element = ET.SubElement(peop_element, 'name')
-                name_element.text = peop.name
+            num_element = ET.SubElement(poez_element, 'num')
+            num_element.text = poez.num
 
-                number_element = ET.SubElement(peop_element, 'number')
-                number_element.text = str(peop.number)
+            time_element = ET.SubElement(poez_element, 'time')
+            time_element.text = str(poez.time)
 
-                year_element = ET.SubElement(peop_element, 'year')
-                year_element.text = str(peop.year)
+            root.append(poez_element)
 
-                root.append(peop_element)
-
-            tree = ET.ElementTree(root)
-            with open(filename, 'wb') as fout:
-                tree.write(fout, encoding='utf8', xml_declaration=True)
-
-    if __name__ == '__main__':
-        people = []
-        staff = Staff
-        while True:
-            command = input(">>> ").lower()
-            if command == 'exit':
-                break
-
-            elif command == 'add':
-                surname = input("Фамилия ")
-                name = input("Имя ")
-                number = int(input("Номер телефона "))
-                year = input("Дата рождения в формате: дд.мм.гггг ")
-
-                staff.add(surname, name, number, year)
+        tree = ET.ElementTree(root)
+        with open(filename, 'wb') as fout:
+            tree.write(fout, encoding='utf8', xml_declaration=True)
 
 
-            elif command == 'list':
-                print(staff)
+if __name__ == '__main__':
+    poezd = []
+    staff = Staff()
+    # Организовать бесконечный цикл запроса команд.
+    while True:
+        # Запросить команду из терминала.
+        command = input(">>> ").lower()
+        # Выполнить действие в соответствие с командой.
+        if command == 'exit':
+            break
 
-            elif command.startswith('select '):
-                parts = command.split(' ', maxsplit=2)
-                sur = (parts[1])
+        elif command == 'add':
+            # Запросить данные о поезде.
+            name = input("Название пункта назначения: ")
+            num = input("Номер поезда: ")
+            time = input("Время отправления: ")
 
-                count = 0
+            staff.add(name, num, time)
 
-                for peop in peoples:
-                    if peop.get('surname') == sur:
-                        count += 1
-                        print('Фамилия:', peop.surname)
-                        print('Имя:', peop.name)
-                        print('Номер телефона:', peop.number)
-                        print('Дата рождения:', peop.year)
+        elif command == 'list':
+            print(staff)
 
-                if count == 0:
-                    print("Таких фамилий нет !")
+        elif command.startswith('select '):
+            parts = command.split(' ', maxsplit=2)
 
-            elif command.startswith('load '):
-                parts = command.split(' ', maxsplit=1)
-                staff.load(parts[1])
+            numbers = int(parts[1])
 
-            elif command.startswith('save '):
-                parts = command.split(' ', maxsplit=1)
-                staff.save(parts[1])
+            c = 0
 
-            elif command == 'help':
-                print("Список команд:\n")
-                print("add - добавить человека;")
-                print("list - вывести список людей;")
-                print("select <фамилия> - запросить информацию по фамилии;")
-                print("load <имя файла> - загрузить данные из файла;")
-                print("save <имя файла> - сохранить данные в файл;")
-                print("help - отобразить справку;")
-                print("exit - завершить работу с программой.")
-            else:
-                print(f
-                "Неизвестная команда {command}", file = sys.stderr)
+            for poez1 in poezd:
+                if poez1.num == numbers:
+                    c += 1
+                    print('Номер поезда:', poez1.num)
+                    print('Пункт назначения:', poez1.name)
+                    print('Время отправления:', poez1.time)
+
+            if c == 0:
+                print("Таких поездов нет!")
+
+        elif command.startswith('load '):
+            # Разбить команду на части для выделения имени файла.
+            parts = command.split(' ', maxsplit=1)
+            staff.load(parts[1])
+
+        elif command.startswith('save '):
+            # Разбить команду на части для выделения имени файла.
+            parts = command.split(' ', maxsplit=1)
+            staff.save(parts[1])
+
+        elif command == 'help':
+
+            print("Список команд:\n")
+            print("add - добавить поезд;")
+            print("list - вывести список поездов;")
+            print("select <номер поезда> - запросить информацию о выбранном времени;")
+            print("help - отобразить справку;")
+            print("load <имя файла> - загрузить данные из файла;")
+            print("save <имя файла> - сохранить данные в файл;")
+            print("exit - завершить работу с программой.")
+        else:
+            print(f"Неизвестная команда {command}", file=sys.stderr)
+            
